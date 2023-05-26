@@ -134,6 +134,7 @@ venv.bak/
 
 # Rope project settings
 .ropeproject
+.idea
 
 # mkdocs documentation
 /site
@@ -172,3 +173,5 @@ cython_debug/
 /dataSources/
 /dataSources.local.xml
 
+/.idea/jupyter-settings.xml
+/.idea/workspace.xml

@@ -7,7 +7,9 @@ from fastapi.logger import logger as fastapi_logger
 
 # custom libs
 from app.routers.user_access import user_access_router
-# from app.helpers.utils.verify_token import verify_token
+from app.routers.predictor import predict_api_routers
+from app.routers.reports import report_api_routers
+
 
 
 # setup logger
@@ -19,7 +21,7 @@ fastapi_logger.handlers = gunicorn_error_logger.handlers
 
 
 app = FastAPI(
-    title="API для работы с предиктивными моделями по оборудованию",
+    title="API доступа к моделям и отчетам",
     description="Сделано в рамках хакатона",
     version="0.0.1",
     contact={
@@ -42,12 +44,16 @@ app.include_router(
     tags=['user_access_router']
 )
 
-# models
-# app.include_router(
-#     assistant_router, prefix='/models',
-#     tags=['assistant_model'],
-#     dependencies=[Depends(verify_token)],
-# )
+app.include_router(
+    predict_api_routers, prefix='/model',
+    tags=['predict_api_routers']
+)
+
+app.include_router(
+    report_api_routers, prefix='/report',
+    tags=['report_api_routers']
+)
+
 
 
 
