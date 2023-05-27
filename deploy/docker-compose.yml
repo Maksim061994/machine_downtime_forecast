@@ -1,0 +1,242 @@
+version: "3.7"
+
+services:
+
+  severstal_ui:
+    image: severstal_ui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: severstal_ui
+    env_file: .env
+    depends_on:
+      - redis
+      - clickhouse
+    restart: unless-stopped
+    hostname: superset
+    environment:
+      - TZ=Europe/Moscow
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "10"
+    ports:
+      - 8089:8088
+    volumes:
+      - ./superset_home:/app/superset_home
+      - ./configs/config.py:/app/superset/config.py
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8088"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.2
+
+  redis:
+    image: redis:7
+    container_name: severstal_cache
+    restart: unless-stopped
+    hostname: redis
+    environment:
+      - TZ=Europe/Moscow
+    ports:
+      - 6378:6379
+    volumes:
+      - ./redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 30s
+      retries: 50
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.3
+      
+  clickhouse:
+    image: clickhouse/clickhouse-server:23.4.2.11
+    container_name: severstal_clickhouse
+    env_file: .env
+    restart: unless-stopped
+    hostname: clickhouse
+    environment:
+      - TZ=Europe/Moscow
+      - ALLOW_EMPTY_PASSWORD=no
+      - CLICKHOUSE_DB=hakaton
+      - CLICKHOUSE_USER=hakaton
+      - CLICKHOUSE_PASSWORD=hakatoN420M3haK
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+    volumes:
+      - ./ch:/var/lib/clickhouse
+      - ./logs/clickhouse:/var/log/clickhouse-server
+      - ./configs/clickhouse:/etc/clickhouse-server
+    cap_add: 
+      - SYS_NICE
+      - NET_ADMIN
+      - IPC_LOCK
+    ulimits:
+      nproc: 65535
+      nofile:
+        soft: 65535
+        hard: 262144
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.4
+
+  postgresql:
+    restart: always
+    image: postgres:15.3
+    container_name: severstal_postgresql
+    hostname: postgresql
+    env_file: .env
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PW}
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - /dev/urandom:/dev/random
+      - ./pgdata:/var/lib/postgresql/data
+    command: >
+     postgres
+       -c port=5433
+       -c max_connections=500
+       -c shared_buffers=4GB
+       -c work_mem=16MB
+       -c maintenance_work_mem=512MB
+       -c random_page_cost=1.1
+       -c effective_cache_size=4GB
+       -c log_destination=stderr
+       -c logging_collector=on
+       -c log_filename='postgresql-%G-%m.log'
+       -c log_truncate_on_rotation=off
+       -c log_rotation_age=10d
+       -c client_min_messages=warning
+       -c log_min_messages=warning
+       -c log_min_error_statement=error
+       -c log_line_prefix='%t %u@%r:%d [%p] '
+       -c log_min_duration_statement=200ms
+       -c log_timezone='Europe/Moscow'
+       -c temp_file_limit=10GB
+       -c idle_in_transaction_session_timeout=30s
+       -c lock_timeout=0
+       -c statement_timeout=6000s
+       -c shared_preload_libraries=pg_stat_statements
+       -c pg_stat_statements.max=10000
+       -c pg_stat_statements.track=all
+       -c timezone='Europe/Moscow'
+       -c track_counts=on
+       -c autovacuum=on
+       -c track_activities=on
+       -c track_io_timing=on       
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-p", "5433" ]
+      interval: 5s
+      retries: 5
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.5
+
+  mlflow:
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile.ml
+    image: mlflow_server
+    container_name: severstal_mlflow
+    hostname: mlflow
+    env_file: .env
+    expose:
+      - ${MLFLOW_PORT}
+    ports:
+      - "${MLFLOW_PORT}:${MLFLOW_PORT}"
+    environment:
+      - TZ=Europe/Moscow
+      - BACKEND=postgresql://${DB_USER}:${DB_PW}@postgresql:${DB_PORT}/${DB_NAME}
+      - AWS_ACCESS_KEY_ID=${MN_USER}
+      - AWS_SECRET_ACCESS_KEY=${MN_PW}
+      - MLFLOW_S3_ENDPOINT_URL=http://minio:9000
+    command: 
+      - sh
+      - -c
+      - mlflow server 
+        --port ${MLFLOW_PORT} 
+        --host 0.0.0.0 
+        --backend-store-uri $${BACKEND} 
+        --default-artifact-root s3://${AWS_BUCKET_NAME}/
+        --artifacts-destination s3://${AWS_BUCKET_NAME}/
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:5000/"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    depends_on:
+      - postgresql
+      - minio
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.6
+
+  api:
+    image: api_severstal_equip:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: severstal_api_equip
+    command: gunicorn app.main:app -k uvicorn.workers.UvicornWorker --log-config=logconf.ini
+    environment:
+      - ENVIRONMENT=
+      - TZ=Europe/Moscow
+      - TOKENIZERS_PARALLELISM=true
+    ports:
+      - 3020:8000
+    restart: always
+    volumes:
+      - ./app:/opt/app
+      - ./configs/gunicorn.conf.py:/opt/gunicorn.conf.py
+      - ./configs/logconf.ini:/opt/logconf.ini
+      - ./.env:/opt/.env
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.7
+
+  minio:
+    image: minio/minio
+    container_name: severstal_minio
+    hostname: minio
+    environment:
+      - TZ=Europe/Moscow
+    ports:
+      - "9000:9000"
+      - "9002:9002"
+    restart: always
+    environment:
+      MINIO_ROOT_USER: "${MN_USER}"
+      MINIO_ROOT_PASSWORD: "${MN_PW}"
+    command: server --console-address ":9002" /data
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "10"
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.8
+        
+networks:
+  severstal:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 193.168.15.0/24

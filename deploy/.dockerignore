@@ -1,0 +1,15 @@
+app/
+ch/
+configs/
+logs/
+pgdata/
+redis/
+superset_home/
+docker-compose*
+.git
+Dockerfile*
+
+
+
+
+
