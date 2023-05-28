@@ -1,6 +1,9 @@
 import os
 import mlflow
 import pandas as pd
+from app.handlers.predictors.schemas import PredictOutput
+import warnings
+warnings.filterwarnings('ignore')
 
 
 os.environ['MLFLOW_S3_ENDPOINT_URL'] = "http://tis5000.vniizht.lan:9000"
@@ -22,12 +25,20 @@ class Predictor:
             5: "runs:/8f659233792648569e7692dd6c0d5417/model"
         }
 
-    def compute(self, data, columns, machine_number):
+    async def __get_predict(self, data, logged_model, columns):
+        loaded_model = mlflow.pyfunc.load_model(logged_model)
+        df = pd.DataFrame(data, columns=columns).astype(float)
+        res = loaded_model.predict(df)
+        res = res.tolist()
+        out_d = {"predicts": res}
+        return out_d
+
+    async def compute(self, data, columns, machine_number):
         logged_model = self.d_machine.get(machine_number)
+        out = None
         if logged_model:
-            loaded_model = mlflow.pyfunc.load_model(logged_model)
-            df = pd.DataFrame(data, columns=columns).astype(float)
-            res = loaded_model.predict(df)
-            return res
+            out_d = await self.__get_predict(data, logged_model, columns)
+            out = PredictOutput(**out_d)
+        return out
 
 

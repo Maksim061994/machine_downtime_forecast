@@ -16,4 +16,7 @@ class PredictSchemas(BaseModel):
     columns: List[str]
 
 
+class PredictOutput(BaseModel):
+    predicts: List[List[float]]
+
 
