@@ -1,7 +1,7 @@
 import os
 import mlflow
 import pandas as pd
-from app.handlers.predictors.schemas import PredictOutput
+import asyncio
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -25,7 +25,7 @@ class Predictor:
             5: "runs:/8f659233792648569e7692dd6c0d5417/model"
         }
 
-    async def __get_predict(self, data, logged_model, columns):
+    def __get_predict(self, data, logged_model, columns):
         loaded_model = mlflow.pyfunc.load_model(logged_model)
         df = pd.DataFrame(data, columns=columns).astype(float)
         res = loaded_model.predict(df)
@@ -35,10 +35,10 @@ class Predictor:
 
     async def compute(self, data, columns, machine_number):
         logged_model = self.d_machine.get(machine_number)
-        out = None
+        out_d = None
         if logged_model:
-            out_d = await self.__get_predict(data, logged_model, columns)
-            out = PredictOutput(**out_d)
-        return out
+            loop = asyncio.get_event_loop()
+            out_d = await loop.run_in_executor(None, self.__get_predict, data, logged_model, columns)
+        return out_d
 
 
