@@ -103,6 +103,7 @@ services:
     volumes:
       - /dev/urandom:/dev/random
       - ./pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/10-init.sql
     command: >
      postgres
        -c port=5433
