@@ -159,7 +159,7 @@ DEFAULT_VIZ_TYPE = "table"
 # default row limit when requesting chart data
 ROW_LIMIT = 50000
 # default row limit when requesting samples from datasource in explore view
-SAMPLES_ROW_LIMIT = 1000
+SAMPLES_ROW_LIMIT = 10000
 # max rows retrieved by filter select auto complete
 FILTER_SELECT_ROW_LIMIT = 10000
 # default time filter in explore
@@ -196,9 +196,9 @@ SQLALCHEMY_TRACK_MODIFICATIONS = False
 SECRET_KEY = os.environ.get("SUPERSET_SECRET_KEY") or CHANGE_ME_SECRET_KEY
 
 # The SQLAlchemy connection string.
-SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
+#SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(DATA_DIR, "superset.db")
 # SQLALCHEMY_DATABASE_URI = 'mysql://myapp@localhost/myapp'
-# SQLALCHEMY_DATABASE_URI = 'postgresql://root:password@localhost/myapp'
+SQLALCHEMY_DATABASE_URI = 'postgresql://postgres:JD643JcviPvhnRtbf@193.168.15.5:5433/superset'
 
 # In order to hook up a custom password store for all SQLALCHEMY connections
 # implement a function that takes a single argument of type 'sqla.engine.url',
@@ -245,7 +245,7 @@ SQLALCHEMY_ENCRYPTED_FIELD_TYPE_ADAPTER = (  # pylint: disable=invalid-name
     SQLAlchemyUtilsAdapter
 )
 # The limit of queries fetched for query search
-QUERY_SEARCH_LIMIT = 1000
+QUERY_SEARCH_LIMIT = 10000
 
 # Flask-WTF flag for CSRF
 WTF_CSRF_ENABLED = True
@@ -452,7 +452,7 @@ DEFAULT_FEATURE_FLAGS: Dict[str, bool] = {
     "DASHBOARD_NATIVE_FILTERS_SET": False,  # deprecated
     "DASHBOARD_FILTERS_EXPERIMENTAL": False,  # deprecated
     "DASHBOARD_VIRTUALIZATION": False,
-    "GLOBAL_ASYNC_QUERIES": True,
+    "GLOBAL_ASYNC_QUERIES": False,
     "VERSIONED_EXPORT": True,
     "EMBEDDED_SUPERSET": False,
     # Enables Alerts and reports new implementation
@@ -712,7 +712,7 @@ EXPLORE_FORM_DATA_CACHE_CONFIG: CacheConfig = {
 STORE_CACHE_KEYS_IN_METADATA_DB = False
 
 # CORS Options
-ENABLE_CORS = False
+ENABLE_CORS = True
 CORS_OPTIONS: Dict[Any, Any] = {}
 
 # Sanitizes the HTML content used in markdowns to allow its rendering in a safe manner.
@@ -855,7 +855,7 @@ DISPLAY_MAX_ROW = 10000
 
 # Default row limit for SQL Lab queries. Is overridden by setting a new limit in
 # the SQL Lab UI
-DEFAULT_SQLLAB_LIMIT = 1000
+DEFAULT_SQLLAB_LIMIT = 10000
 
 # Adds a warning message on sqllab save query and schedule query modals.
 SQLLAB_SAVE_WARNING_MESSAGE = None
@@ -883,9 +883,9 @@ DASHBOARD_AUTO_REFRESH_INTERVALS = [
 
 
 class CeleryConfig:  # pylint: disable=too-few-public-methods
-    broker_url = "sqla+sqlite:///celerydb.sqlite"
+    broker_url = "sqla+postgresql://postgres:JD643JcviPvhnRtbf@postgresql:5433/superset"
     imports = ("superset.sql_lab",)
-    result_backend = "db+sqlite:///celery_results.sqlite"
+    result_backend = "db+postgresql://postgres:JD643JcviPvhnRtbf@postgresql:5433/superset"
     worker_prefetch_multiplier = 1
     task_acks_late = False
     task_annotations = {

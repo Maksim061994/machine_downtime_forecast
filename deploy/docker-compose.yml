@@ -12,6 +12,7 @@ services:
     depends_on:
       - redis
       - clickhouse
+      - postgresql
     restart: unless-stopped
     hostname: superset
     environment:
@@ -24,7 +25,6 @@ services:
     ports:
       - 8089:8088
     volumes:
-      - ./superset_home:/app/superset_home
       - ./configs/config.py:/app/superset/config.py
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8088"]
@@ -69,7 +69,7 @@ services:
       - CLICKHOUSE_PASSWORD=hakatoN420M3haK
     ports:
       - "8123:8123"
-      - "9000:9000"
+      - "9010:9000"
     volumes:
       - ./ch:/var/lib/clickhouse
       - ./logs/clickhouse:/var/log/clickhouse-server
