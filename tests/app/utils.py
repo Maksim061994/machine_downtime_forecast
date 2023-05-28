@@ -10,7 +10,7 @@ def default_check_data(response: requests.Response, data_len: int = 100) -> None
 
 
 def get_token(client):
-    response = client.post("/users/login", json={"login": "vniizht", "password": "@Z&WSSv?5|AVhTeD"})
+    response = client.post("/users/login", json={"login": "login", "password": "pass"})
     data = response.json()
     return data["token"]
 

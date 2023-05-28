@@ -9,18 +9,15 @@ settings = get_settings()
 
 
 @report_api_routers.get('/m1')
-async def report_m1(request: PredictParamsSchema):
-    predictor = Predictor(settings)
-    return await predictor.compute(request)
+async def report_m1(request):
+    return "В разработке"
 
 
 @report_api_routers.get('/m3')
-async def report_m1(request: PredictParamsSchema):
-    predictor = Predictor(settings)
-    return await predictor.compute(request)
+async def report_m1(request):
+    return "В разработке"
 
 
 @report_api_routers.get('/test')
-async def report_m1(request: PredictParamsSchema):
-    predictor = Predictor(settings)
-    return await predictor.compute(request)
+async def report_m1(request):
+    return "В разработке"

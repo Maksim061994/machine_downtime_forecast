@@ -7,7 +7,7 @@ from app.handlers.user_access.schemas import UserLoginSchema, UserSchema
 
 
 DB = {
-    "vniizht": UserSchema(login="vniizht", password="$2b$12$8hr6cXforBTbBLeA5DuaNuHrHUM9fQ4fcW0WnBGEE0Jjx7W.5KUae")
+    "present": UserSchema(login="present", password="$2b$12$8hr6cXforBTbBLeA5DuaNuHrHUM9fQ4fcW0WnBGEE0Jjx7W.5KUae")
 }
 
 class UserAccess:

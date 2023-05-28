@@ -1,7 +1,7 @@
-CREATE TABLE IF NOT EXISTS hakaton.features
+CREATE TABLE IF NOT EXISTS hakaton.telemetry
 (
     dt      DATETIME,
-    machine UInt16,
+    machine_number UInt16,
     vibration_on_support_1 Nullable(Float64),
     vibration_on_support_2 Nullable(Float64),
     vibration_on_support_3 Nullable(Float64),
@@ -18,4 +18,4 @@ CREATE TABLE IF NOT EXISTS hakaton.features
     stator_current_2 Nullable(Float64)
 )
 ENGINE = MergeTree
-ORDER BY (dt, machine)
+ORDER BY (dt, machine_number)
