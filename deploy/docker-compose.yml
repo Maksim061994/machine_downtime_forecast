@@ -21,7 +21,7 @@ services:
       driver: "json-file"
       options:
         max-size: 10m
-        max-file: "10"
+        max-file: "5"
     ports:
       - 8089:8088
     volumes:
@@ -35,6 +35,74 @@ services:
       severstal:
         ipv4_address: 193.168.15.2
 
+  celery:
+    image: severstal_ui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: severstal_ui_worker
+    environment:
+      - TZ=Europe/Moscow
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "5"
+    volumes:
+      - ./configs/config.py:/app/superset/config.py
+    command: celery -A superset.tasks.celery_app:app worker -E --pool=prefork -O fair -c 4
+    env_file: .env
+    restart: unless-stopped
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.9
+
+  beat:
+    image: severstal_ui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: severstal_ui_beat
+    environment:
+      - TZ=Europe/Moscow
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "5"
+    volumes:
+      - ./configs/config.py:/app/superset/config.py
+    command: celery -A superset.tasks.celery_app:app beat --pidfile= -f /tmp/celery_beat.log -s /tmp/celerybeat-schedule
+    env_file: .env
+    restart: unless-stopped
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.10
+
+  flower:
+    image: severstal_ui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: severstal_ui_flower
+    environment:
+      - TZ=Europe/Moscow
+    logging:
+      driver: "json-file"
+      options:
+        max-size: 10m
+        max-file: "5"
+    ports:
+      - 5555:5555
+    volumes:
+      - ./configs/config.py:/app/superset/config.py
+    command: celery -A superset.tasks.celery_app:app flower
+    env_file: .env
+    restart: unless-stopped
+    networks:
+      severstal:
+        ipv4_address: 193.168.15.11
+
   redis:
     image: redis:7
     container_name: severstal_cache
@@ -43,7 +111,7 @@ services:
     environment:
       - TZ=Europe/Moscow
     ports:
-      - 6378:6379
+      - 6379:6379
     volumes:
       - ./redis:/data
     healthcheck:
@@ -149,7 +217,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.ml
-    image: mlflow_server
+    image: mlflow_server:latest
     container_name: severstal_mlflow
     hostname: mlflow
     env_file: .env

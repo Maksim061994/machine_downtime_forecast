@@ -1,0 +1,14 @@
+FROM apache/superset:1583090623c5083de504ad1e1710b894f0dc7f67
+USER root
+
+RUN apt-get update && \
+    apt-get install -y wget zip unzip tar nano telnet firefox-esr
+ENV GECKODRIVER_VERSION=0.29.0
+RUN wget -q https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz && \
+    tar -x geckodriver -zf geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz -O > /usr/bin/geckodriver && \
+    chmod 755 /usr/bin/geckodriver && \
+    rm geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz && \
+    pip install --upgrade pip && \
+    pip install --no-cache gevent psycopg2 redis clickhouse-connect clickhouse-driver clickhouse-sqlalchemy celery gunicorn flower && \
+    pip install --no-cache -r superset/translations/requirements.txt
+USER superset
