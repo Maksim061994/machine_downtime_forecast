@@ -13,16 +13,18 @@ mlflow.set_tracking_uri("http://tis5000.vniizht.lan:5000")
 mlflow.set_experiment("exg-machine-downtime-forecast")
 
 
-
-
 class Predictor:
     # TODO: рефакторинг
 
     def __init__(self, settings):
         self.setting = settings
         self.d_machine = {
-            4: "runs:/dc5de2c91e394e3a99d2aeebb6bd4a25/model",
-            5: "runs:/8f659233792648569e7692dd6c0d5417/model"
+            4: "runs:/1173d0bf82d94c399089acde753db61b/model",
+            5: "runs:/667ba75ca85b4016bffd57e340939e4a/model",
+            6: "runs:/03731a859af44ec7a88fc869716794d9/model",
+            7: "runs:/71ce6e6640994ad4969dd4bcd6ce6bf9/model",
+            8: "runs:/ef6c50e2c9d04b5082076b90d7953682/model",
+            9: "runs:/14e3514d4ef34e2591de0137babaddb7/model"
         }
 
     def __get_predict(self, data, logged_model, columns):

@@ -1,0 +1,35 @@
+CREATE TABLE IF NOT EXISTS hakaton.predict_m3_exg9
+(
+    dt      DATETIME,
+    exhaust_valve Nullable(UInt32),
+    lubrication_oil_station Nullable(UInt32),
+    electrical_equipment Nullable(UInt32),
+    limit_switch_no_1 Nullable(UInt32),
+    electric_motor Nullable(UInt32),
+    housing Nullable(UInt32),
+    gas_valve_reducer Nullable(UInt32),
+    oil_cooler_M_05_1 Nullable(UInt32),
+    gas_valve_motor Nullable(UInt32),
+    electrical_equipment_1 Nullable(UInt32),
+    thrust_bearing Nullable(UInt32),
+    rotor Nullable(UInt32),
+    transformer_TM_6300_10_6 Nullable(UInt32),
+    support_bearing Nullable(UInt32),
+    working_oil_pump Nullable(UInt32),
+    support_bearing_no_2 Nullable(UInt32),
+    gasoline Nullable(UInt32),
+    coupling_cover Nullable(UInt32),
+    support_bearing_no_1 Nullable(UInt32),
+    valve Nullable(UInt32),
+    vibro_converter_VK_310S Nullable(UInt32),
+    oil_pipes Nullable(UInt32),
+    thyristor_exciter_TV_400 Nullable(UInt32),
+    pressure_sensors_Metran_100 Nullable(UInt32),
+    temperature_sensor_TSM_101_010_50M_80 Nullable(UInt32),
+    temperature_sensor_TSM_101_010_50M_400 Nullable(UInt32),
+    exhauster_no_9 Nullable(UInt32),
+    motor_of_start_up_oil_pump Nullable(UInt32),
+    equip_with_anomaly Nullable(UInt32)
+)
+ENGINE = MergeTree
+ORDER BY (dt)

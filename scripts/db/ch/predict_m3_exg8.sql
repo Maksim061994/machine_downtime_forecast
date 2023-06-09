@@ -1,0 +1,38 @@
+CREATE TABLE IF NOT EXISTS hakaton.predict_m3_exg8
+(
+    dt      DATETIME,
+    rotor Nullable(UInt32),
+    motor Nullable(UInt32),
+    housing Nullable(UInt32),
+    gasvalve_reducer Nullable(UInt32),
+    vibroconverter_VK310SEXG8T3 Nullable(UInt32),
+    vibroconverter_VK310SEXG8T4 Nullable(UInt32),
+    gasvalve_motor Nullable(UInt32),
+    oilcooler_M051 Nullable(UInt32),
+    transformer_TM400010_5 Nullable(UInt32),
+    CL2TR7toED_EXG8 Nullable(UInt32),
+    CL1TR7toED_EXG8 Nullable(UInt32),
+    temperature_sensor_4002EXG7 Nullable(UInt32),
+    coupling_cover Nullable(UInt32),
+    gasoline Nullable(UInt32),
+    support_bearing_2 Nullable(UInt32),
+    exhauster_EXG8 Nullable(UInt32),
+    regulating_equipment_EXG8 Nullable(UInt32),
+    temperature_sensor_2003_EXG8 Nullable(UInt32),
+    oil_filter_EXG8 Nullable(UInt32),
+    thyristor_exciter_TV400EXG8WU1 Nullable(UInt32),
+    support_bearing_1 Nullable(UInt32),
+    electrical_equipment_EXG8 Nullable(UInt32),
+    support_bearing Nullable(UInt32),
+    valve Nullable(UInt32),
+    working_oil_pump Nullable(UInt32),
+    gear_oil_pump_rez_EXG8 Nullable(UInt32),
+    gear_oil_pump_run_EXG8 Nullable(UInt32),
+    vibro_converter_VK310S_EXG8T2 Nullable(UInt32),
+    transformer_TM400010_6 Nullable(UInt32),
+    thrustbearing Nullable(UInt32),
+    oil_pipes_EXG8 Nullable(UInt32),
+    equip_with_anomaly Nullable(UInt32)
+)
+ENGINE = MergeTree
+ORDER BY (dt)
